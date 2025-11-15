@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>四关多彩捏泡泡挑战</title>
+  <style>
+    .bubble {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgba(0, 123, 255, 0.7);
+      position: absolute;
+      cursor: pointer;
+      animation: float 3s infinite ease-in-out;
+      transition: all 0.2s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-20px) rotate(5deg);
+      }
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.8);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    body {
+      overflow: hidden;
+      position: relative;
+      height: 100vh;
+      margin: 0;
+      background-color: #f8f9fa;
+      font-family: "Arial", sans-serif;
+    }
+
+    .counter {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .level-indicator {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.98);
+      padding: 40px 60px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 100;
+      text-align: center;
+    }
+
+    .modal-btn-group {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 12px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .continue-btn {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .continue-btn:hover {
+      background-color: #219653;
+    }
+
+    .end-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .end-btn:hover {
+      background-color: #c0392b;
+    }
+
+    .restart-btn {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .restart-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="level-indicator">第1关：目标5个</div>
+  <div class="counter">捏破: 0/5</div>
+
+  <!-- 关卡完成弹窗 -->
+  <div class="modal" id="levelCompleteModal">
+    <div id="modalContent">第1关完成！</div>
+    <div class="modal-btn-group">
+      <button class="modal-btn continue-btn" onclick="nextLevel()">继续挑战</button>
+      <button class="modal-btn end-btn" onclick="endGame()">结束挑战</button>
+    </div>
+  </div>
+
+  <!-- 通关弹窗 -->
+  <div class="modal" id="allPassedModal">
+    恭喜通关所有关卡！<br>
+    累计捏破50个泡泡～
+    <div class="modal-btn-group">
+      <button class="modal-btn restart-btn" onclick="restartGame()">重新开始</button>
+    </div>
+  </div>
+
+  <script>
+    // 四关目标配置：5→10→15→20
+    const levels = [5, 10, 15, 20];
+    let currentLevel = 0;
+    let popCount = 0;
+    let maxPops = levels[currentLevel];
+
+    // DOM元素
+    const counterEl = document.querySelector('.counter');
+    const levelIndicatorEl = document.querySelector('.level-indicator');
+    const levelCompleteModal = document.getElementById('levelCompleteModal');
+    const modalContentEl = document.getElementById('modalContent');
+    const allPassedModal = document.getElementById('allPassedModal');
+
+    // 创建随机多彩泡泡（不叠加）
+    function createBubbles() {
+      clearAllBubbles(); // 生成前清空旧泡泡
+      const numBubbles = 6; // 每关初始6个，始终不超这个数
+      for (let i = 0; i < numBubbles; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.style.left = `${Math.random() * 85}%`;
+        bubble.style.top = `${Math.random() * 75}%`;
+        const size = 40 + Math.random() * 20;
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        // 五颜六色随机色
+        bubble.style.backgroundColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${0.7 + Math.random() * 0.2})`;
+        bubble.style.animationDelay = `${Math.random() * 2}s`;
+        document.body.appendChild(bubble);
+        bindBubbleClick(bubble);
+      }
+    }
+
+    // 清空所有泡泡
+    function clearAllBubbles() {
+      document.querySelectorAll('.bubble').forEach(b => b.remove());
+    }
+
+    // 播放音效
+    function playPopSound() {
+      try {
+        const audio = new Audio('data:audio/wav;base64,UklGRiQDAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQ==');
+        audio.volume = 0.5;
+        audio.play().catch(e => { });
+      } catch (err) { }
+    }
+
+    // 更新界面
+    function updateUI() {
+      counterEl.textContent = `捏破: ${popCount}/${maxPops}`;
+      levelIndicatorEl.textContent = `第${currentLevel + 1}关：目标${maxPops}个`;
+    }
+
+    // 绑定点击事件
+    function bindBubbleClick(bubble) {
+      bubble.addEventListener('click', () => {
+        if (popCount >= maxPops) return;
+
+        playPopSound();
+        bubble.style.animation = 'pop 0.3s forwards';
+        popCount++;
+        updateUI();
+
+        setTimeout(() => {
+          bubble.remove();
+          // 未达标则补充1个，保持最多6个
+          if (popCount < maxPops) {
+            setTimeout(() => {
+              const currentNum = document.querySelectorAll('.bubble').length;
+              if (currentNum < 6) createSingleBubble();
+            }, 800);
+          } else {
+            setTimeout(showLevelCompleteModal, 500);
+          }
+        }, 300);
+      });
+    }
+
+    // 生成单个多彩泡泡（补充用）
+    function createSingleBubble() {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.style.left = `${Math.random() * 85}%`;
+      bubble.style.top = `${Math.random() * 75}%`;
+      const size = 40 + Math.random() * 20;
+      bubble.style.width = `${size}px`;
+      bubble.style.height = `${size}px`;
+      bubble.style.backgroundColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${0.7 + Math.random() * 0.2})`;
+      bubble.style.animationDelay = `${Math.random() * 2}s`;
+      document.body.appendChild(bubble);
+      bindBubbleClick(bubble);
+    }
+
+    // 显示关卡完成弹窗
+    function showLevelCompleteModal() {
+      if (currentLevel === levels.length - 1) {
+        allPassedModal.style.display = 'block';
+      } else {
+        modalContentEl.textContent = `第${currentLevel + 1}关完成！\n下一关目标${levels[currentLevel + 1]}个`;
+        levelCompleteModal.style.display = 'block';
+      }
+    }
+
+    // 下一关（重置状态）
+    function nextLevel() {
+      currentLevel++;
+      maxPops = levels[currentLevel];
+      popCount = 0;
+      levelCompleteModal.style.display = 'none';
+      updateUI();
+      createBubbles();
+    }
+
+    // 结束挑战
+    function endGame() {
+      if (confirm(`挑战结束！你完成了第${currentLevel + 1}关，是否重新开始？`)) {
+        restartGame();
+      } else {
+        levelCompleteModal.style.display = 'none';
+        clearAllBubbles();
+      }
+    }
+
+    // 重新开始
+    function restartGame() {
+      currentLevel = 0;
+      maxPops = levels[currentLevel];
+      popCount = 0;
+      allPassedModal.style.display = 'none';
+      levelCompleteModal.style.display = 'none';
+      updateUI();
+      createBubbles();
+    }
+
+    // 初始化
+    updateUI();
+    createBubbles();
+  </script>
+</body>
+
+</html>

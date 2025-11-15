@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>递进式数字消除（三关挑战）</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f8f9fa;
+      font-family: "Arial", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .game-container {
+      max-width: 800px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .number {
+      width: 65px;
+      height: 65px;
+      line-height: 65px;
+      text-align: center;
+      background: #e9ecef;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 26px;
+      font-weight: bold;
+      transition: all 0.25s;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .number:hover {
+      background: #dee2e6;
+      transform: translateY(-2px);
+    }
+
+    .number.active {
+      background: #4dabf7;
+      color: white;
+      box-shadow: 0 4px 8px rgba(77, 171, 247, 0.4);
+    }
+
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 800px;
+    }
+
+    .title {
+      font-size: 32px;
+      color: #333;
+      margin: 0;
+    }
+
+    .level-indicator {
+      font-size: 22px;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 8px 18px;
+      border-radius: 25px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.98);
+      padding: 40px 60px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 100;
+      text-align: center;
+    }
+
+    .modal-btn-group {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 12px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .continue-btn {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .continue-btn:hover {
+      background-color: #219653;
+    }
+
+    .end-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .end-btn:hover {
+      background-color: #c0392b;
+    }
+
+    .restart-btn {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .restart-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1 class="title">数字消除挑战</h1>
+    <div class="level-indicator">第1关：数字1-3</div>
+  </div>
+  <div class="game-container" id="gameContainer"></div>
+
+  <!-- 关卡完成弹窗 -->
+  <div class="modal" id="levelCompleteModal">
+    <div id="modalContent">第1关完成！</div>
+    <div class="modal-btn-group">
+      <button class="modal-btn continue-btn" onclick="nextLevel()">继续挑战</button>
+      <button class="modal-btn end-btn" onclick="endGame()">结束挑战</button>
+    </div>
+  </div>
+
+  <!-- 通关弹窗 -->
+  <div class="modal" id="allPassedModal">
+    恭喜通关所有关卡！<br>
+    消除大师就是你～
+    <div class="modal-btn-group">
+      <button class="modal-btn restart-btn" onclick="restartGame()">重新开始</button>
+    </div>
+  </div>
+
+  <script>
+    // 三关配置：数字范围、数量、消除目标
+    const levels = [
+      { min: 1, max: 3, count: 18, target: 9 }, // 第1关：1-3，18个数字，消除9对
+      { min: 1, max: 4, count: 24, target: 12 }, // 第2关：1-4，24个数字，消除12对
+      { min: 1, max: 5, count: 30, target: 15 }  // 第3关：1-5，30个数字，消除15对
+    ];
+    let currentLevel = 0;
+    let selected = null;
+    let eliminatedPairs = 0; // 已消除对数
+    let levelConfig = levels[currentLevel];
+
+    // DOM元素
+    const gameContainer = document.getElementById('gameContainer');
+    const levelIndicator = document.querySelector('.level-indicator');
+    const levelCompleteModal = document.getElementById('levelCompleteModal');
+    const modalContent = document.getElementById('modalContent');
+    const allPassedModal = document.getElementById('allPassedModal');
+
+    // 初始化关卡
+    function initLevel() {
+      gameContainer.innerHTML = ''; // 清空上一关内容
+      eliminatedPairs = 0;
+      selected = null;
+      levelConfig = levels[currentLevel];
+      // 更新关卡提示
+      levelIndicator.textContent = `第${currentLevel + 1}关：数字${levelConfig.min}-${levelConfig.max}`;
+      // 生成数字格子
+      generateNumbers();
+    }
+
+    // 生成随机数字
+    function generateNumbers() {
+      const numbers = [];
+      // 生成成对数字（确保可全部消除）
+      for (let i = 0; i < levelConfig.count / 2; i++) {
+        const num = Math.floor(Math.random() * (levelConfig.max - levelConfig.min + 1)) + levelConfig.min;
+        numbers.push(num, num);
+      }
+      // 打乱顺序
+      numbers.sort(() => Math.random() - 0.5);
+      // 创建数字元素
+      numbers.forEach(num => {
+        const numEl = document.createElement('div');
+        numEl.className = 'number';
+        numEl.textContent = num;
+        numEl.addEventListener('click', () => handleNumberClick(numEl));
+        gameContainer.appendChild(numEl);
+      });
+    }
+
+    // 点击数字处理
+    function handleNumberClick(el) {
+      // 已选中当前数字或已消除的数字，不响应
+      if (el === selected || el.style.transform === 'scale(0)') return;
+
+      if (selected) {
+        // 选中第二个数字，判断是否相同
+        if (selected.textContent === el.textContent) {
+          // 消除相同数字
+          selected.style.transform = 'scale(0)';
+          el.style.transform = 'scale(0)';
+          setTimeout(() => {
+            selected.style.opacity = 0;
+            el.style.opacity = 0;
+          }, 300);
+          eliminatedPairs++;
+          selected = null;
+          // 检查是否完成关卡
+          checkLevelComplete();
+        } else {
+          // 不同数字，取消选中
+          selected.classList.remove('active');
+          selected = el;
+          el.classList.add('active');
+        }
+      } else {
+        // 选中第一个数字
+        selected = el;
+        el.classList.add('active');
+      }
+    }
+
+    // 检查关卡是否完成
+    function checkLevelComplete() {
+      if (eliminatedPairs === levelConfig.target) {
+        setTimeout(() => {
+          if (currentLevel === levels.length - 1) {
+            // 通关所有关卡
+            allPassedModal.style.display = 'block';
+          } else {
+            // 显示关卡完成弹窗
+            modalContent.textContent = `第${currentLevel + 1}关完成！\n下一关数字${levels[currentLevel + 1].min}-${levels[currentLevel + 1].max}`;
+            levelCompleteModal.style.display = 'block';
+          }
+        }, 500);
+      }
+    }
+
+    // 下一关
+    function nextLevel() {
+      currentLevel++;
+      levelCompleteModal.style.display = 'none';
+      initLevel();
+    }
+
+    // 结束挑战
+    function endGame() {
+      if (confirm(`挑战结束！你完成了第${currentLevel + 1}关，是否重新开始？`)) {
+        restartGame();
+      } else {
+        levelCompleteModal.style.display = 'none';
+      }
+    }
+
+    // 重新开始
+    function restartGame() {
+      currentLevel = 0;
+      allPassedModal.style.display = 'none';
+      levelCompleteModal.style.display = 'none';
+      initLevel();
+    }
+
+    // 初始化第一关
+    initLevel();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心晴树洞 - 你的情绪倾听者</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft Yahei", "Heiti SC", sans-serif;
+    }
+
+    body {
+      background: #f0f7ff;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .header h1 {
+      color: #1a73e8;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .tree-hole {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .input-area {
+      margin-bottom: 25px;
+    }
+
+    .input-area label {
+      display: block;
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .input-area textarea {
+      width: 100%;
+      height: 200px;
+      padding: 15px;
+      border: 1px solid #e3f2fd;
+      border-radius: 8px;
+      resize: none;
+      font-size: 16px;
+      line-height: 1.6;
+      transition: border 0.3s;
+    }
+
+    .input-area textarea:focus {
+      outline: none;
+      border-color: #64b5f6;
+      box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-analyze {
+      background: #4285f4;
+      color: white;
+    }
+
+    .btn-analyze:hover {
+      background: #3367d6;
+      transform: translateY(-2px);
+    }
+
+    .btn-clear {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .btn-clear:hover {
+      background: #eee;
+      transform: translateY(-2px);
+    }
+
+    .result-area {
+      margin-top: 30px;
+      padding: 25px;
+      background: #f5fafe;
+      border-radius: 10px;
+      border-left: 4px solid #64b5f6;
+      display: none;
+    }
+
+    .result-area.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .result-header h2 {
+      color: #1a73e8;
+      font-size: 22px;
+      margin-right: 15px;
+    }
+
+    .emotion-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .emotion-tag {
+      padding: 6px 15px;
+      background: #e3f2fd;
+      color: #1a73e8;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .emotion-desc {
+      color: #333;
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .suggestion-title {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .suggestion-list {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.8;
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+
+    .help-info {
+      padding: 15px;
+      background: #fff8e1;
+      border-radius: 8px;
+      border-left: 3px solid #ffb74d;
+      margin-top: 20px;
+    }
+
+    .help-info p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .help-info strong {
+      color: #f44336;
+    }
+
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 14px;
+      margin-top: auto;
+      padding: 20px 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>心晴树洞</h1>
+    <p>把你的烦恼、开心或心里话写下来，我会成为你的专属情绪倾听者，帮你分析状态~</p>
+  </div>
+
+  <div class="tree-hole">
+    <div class="input-area">
+      <label for="emotionText">你的倾诉：</label>
+      <textarea id="emotionText" placeholder="比如：最近考试压力好大，晚上总失眠，看着别人都很轻松，我却越学越焦虑..."></textarea>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-analyze" onclick="analyzeEmotion()">提交分析</button>
+      <button class="btn-clear" onclick="clearText()">清空内容</button>
+    </div>
+
+    <!-- 分析结果区域 -->
+    <div class="result-area" id="resultArea">
+      <div class="result-header">
+        <h2>情绪分析结果</h2>
+      </div>
+      <div class="emotion-tags" id="emotionTags"></div>
+      <div class="emotion-desc" id="emotionDesc"></div>
+      <div class="suggestion-title">情绪调节建议：</div>
+      <ul class="suggestion-list" id="suggestionList"></ul>
+      <div class="help-info">
+        <p>若情绪持续困扰超过2周，建议及时寻求专业帮助：</p>
+        <p>全国心理援助热线：<strong>400-161-9995</strong>（24小时服务）</p>
+        <p>青少年心理援助热线：<strong>12355</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>心晴树洞 © 2025 | 你的情绪，值得被倾听</p>
+  </div>
+
+  <script>
+    // 情绪关键词库与对应配置（可扩展）
+    const emotionConfig = {
+      焦虑: {
+        keywords: ['焦虑', '烦躁', '睡不着', '失眠', '压力大', '紧张', '心慌', '不安', '着急', '烦躁不安'],
+        desc: '你目前主要处于焦虑情绪中，可能是由于近期压力过大、对未来过度担忧或任务堆积导致。这种情绪会让你感到心神不宁，甚至影响睡眠和注意力。',
+        suggestions: [
+          '进行深呼吸练习：吸气4秒，屏息2秒，呼气6秒，重复5-10次，快速缓解紧张。',
+          '将大任务拆分成小目标，逐步完成，减少心理负担。',
+          '每天预留10分钟做喜欢的事（如听音乐、画画），转移注意力。'
+        ]
+      },
+      抑郁: {
+        keywords: ['难过', '伤心', '低落', '没力气', '不想动', '绝望', '想哭', '没意思', '提不起劲'],
+        desc: '你目前表现出明显的抑郁倾向，情绪低落，对事物缺乏兴趣，可能伴有精力不足的情况。这可能与近期的负面事件、孤独感或长期压力有关。',
+        suggestions: [
+          '每天强迫自己出门散步20分钟，接触阳光和新鲜空气，改善情绪。',
+          '与信任的家人或朋友倾诉，不要独自承受负面情绪。',
+          '制定简单的每日计划（如按时吃饭、整理房间），逐步恢复生活节奏。'
+        ]
+      },
+      压力: {
+        keywords: ['忙', '累', '压力', '加班', '赶工', '任务重', '超负荷', '喘不过气'],
+        desc: '你当前的核心情绪是压力过载，可能是由于工作、学习或生活中的任务超出了你的承受范围，导致身心疲惫。',
+        suggestions: [
+          '学会拒绝不合理的任务，明确自己的能力边界。',
+          '采用"番茄工作法"：工作25分钟，休息5分钟，提高效率的同时避免过度劳累。',
+          '睡前泡个热水澡或听舒缓的音乐，帮助身体和心理放松。'
+        ]
+      },
+      开心: {
+        keywords: ['开心', '快乐', '高兴', '兴奋', '愉快', '幸福', '满足', '开心极了'],
+        desc: '太棒啦！你目前处于积极的情绪状态中，这种愉悦感会让你充满活力，也能提升免疫力和人际关系。请继续保持这份好心情！',
+        suggestions: [
+          '把开心的事记录下来，形成"快乐日记"，日后翻看能再次唤起愉悦感。',
+          '与他人分享你的快乐，积极情绪会相互传递。',
+          '保持当前的生活节奏，继续做让自己感到满足的事。'
+        ]
+      },
+      委屈: {
+        keywords: ['委屈', '冤枉', '不被理解', '没人懂', '受委屈', '心里不舒服'],
+        desc: '你目前感到委屈和不被理解，这种情绪通常源于他人的误解或忽视，让你觉得自己的感受没有被重视。',
+        suggestions: [
+          '找一个安全的倾诉对象，把心里的委屈说出来，释放情绪。',
+          '尝试换个角度看待问题，或许对方并非有意忽视你的感受。',
+          '用文字写下自己的感受和想法，梳理情绪的同时也能理清思路。'
+        ]
+      },
+      孤独: {
+        keywords: ['孤独', '孤单', '没人陪', '独自一人', '寂寞', '冷清'],
+        desc: '你当前主要的情绪是孤独感，可能是由于缺乏社交互动、异地生活或内心需求未被满足导致。长期孤独会影响心理状态，需要主动调节。',
+        suggestions: [
+          '主动联系久未见面的朋友，约一次聊天或聚会。',
+          '参与兴趣社群（如读书群、运动群），认识志同道合的人。',
+          '培养一项新爱好，让自己的生活变得充实，减少孤独感。'
+        ]
+      }
+    };
+
+    // 分析情绪的核心函数
+    function analyzeEmotion() {
+      const text = document.getElementById('emotionText').value.trim();
+      if (!text) {
+        alert('请先输入你的心里话哦~');
+        return;
+      }
+
+      // 匹配情绪关键词
+      const matchedEmotions = [];
+      for (const [emotion, config] of Object.entries(emotionConfig)) {
+        const hasKeyword = config.keywords.some(keyword => text.includes(keyword));
+        if (hasKeyword) {
+          matchedEmotions.push(emotion);
+        }
+      }
+
+      // 处理分析结果
+      const resultArea = document.getElementById('resultArea');
+      const emotionTags = document.getElementById('emotionTags');
+      const emotionDesc = document.getElementById('emotionDesc');
+      const suggestionList = document.getElementById('suggestionList');
+
+      // 清空之前的结果
+      emotionTags.innerHTML = '';
+      emotionDesc.innerHTML = '';
+      suggestionList.innerHTML = '';
+
+      // 无匹配情绪（默认轻度压力）
+      if (matchedEmotions.length === 0) {
+        emotionTags.innerHTML = '<span class="emotion-tag">轻度压力</span><span class="emotion-tag">情绪平稳</span>';
+        emotionDesc.innerHTML = '你的情绪整体平稳，但可能存在轻微的压力未被明确表达。适当的情绪调节能帮助你保持更好的心理状态。';
+        suggestionList.innerHTML = `
+                    <li>每天花5分钟进行冥想，放空大脑，缓解潜在压力。</li>
+                    <li>保持规律作息，保证充足睡眠，为情绪稳定提供基础。</li>
+                    <li>定期与家人朋友沟通，维持良好的社交关系。</li>
+                `;
+      } else {
+        // 显示匹配的情绪标签
+        matchedEmotions.forEach(emotion => {
+          emotionTags.innerHTML += `<span class="emotion-tag">${emotion}</span>`;
+        });
+
+        // 合并情绪描述（取第一个主要情绪的描述，其他补充）
+        const mainEmotion = matchedEmotions[0];
+        emotionDesc.innerHTML = emotionConfig[mainEmotion].desc;
+        if (matchedEmotions.length > 1) {
+          emotionDesc.innerHTML += ' 同时，你还表现出' + matchedEmotions.slice(1).join('和') + '的情绪，多种情绪交织可能会让你感到更加复杂。';
+        }
+
+        // 合并建议（去重）
+        const allSuggestions = new Set();
+        matchedEmotions.forEach(emotion => {
+          emotionConfig[emotion].suggestions.forEach(suggest => {
+            allSuggestions.add(suggest);
+          });
+        });
+        allSuggestions.forEach(suggest => {
+          suggestionList.innerHTML += `<li>${suggest}</li>`;
+        });
+      }
+
+      // 显示结果区域
+      resultArea.classList.add('active');
+      // 滚动到结果区域
+      resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // 清空输入内容
+    function clearText() {
+      document.getElementById('emotionText').value = '';
+      document.getElementById('resultArea').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
