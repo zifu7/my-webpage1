@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心晴空间 - 你的心理健康伙伴</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft Yahei", sans-serif;
+    }
+
+    :root {
+      --primary: #5b86e5;
+      --light: #f5f9ff;
+      --white: #ffffff;
+      --gray: #666666;
+      --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      background: linear-gradient(120deg, #f0f7ff 0%, #e8f4f8 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* 导航栏 */
+    .navbar {
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      padding: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 10px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 核心模块 */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+    }
+
+    .module-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(91, 134, 229, 0.15);
+    }
+
+    .module-icon {
+      width: 100px;
+      height: 100px;
+      background: var(--light);
+      border-radius: 25px;
+      margin: 0 auto 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: var(--primary);
+    }
+
+    .module-title {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .module-desc {
+      font-size: 16px;
+      color: var(--gray);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .module-btn {
+      display: inline-block;
+      padding: 12px 35px;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    .module-btn:hover {
+      background: #4a76d4;
+    }
+
+    /* 游戏分类弹窗（默认隐藏） */
+    .game-category {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .category-content {
+      background: white;
+      width: 90%;
+      max-width: 800px;
+      border-radius: 16px;
+      padding: 30px;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      color: var(--gray);
+      cursor: pointer;
+    }
+
+    .category-title {
+      font-size: 24px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: var(--primary);
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .game-item {
+      padding: 20px;
+      background: var(--light);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .game-name {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .game-link {
+      font-size: 14px;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .container {
+        gap: 25px;
+      }
+
+      .module-card {
+        padding: 30px 20px;
+      }
+
+      .module-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <a href=" " class="logo">
+      <div class="logo-icon">心</div>
+      心晴空间
+    </a>
+  </nav>
+
+  <!-- 核心功能模块 -->
+  <div class="container">
+    <!-- 树洞模块 -->
+    <div class="module-card">
+      <div class="module-icon">✏️</div>
+      <h3 class="module-title">心晴树洞</h3>
+      <p class="module-desc">匿名倾诉你的烦恼与心事，释放心理压力，获得温暖的情绪反馈。</p>
+      <a href="树洞.html" class="module-btn">进入倾诉</a>
+    </div>
+
+    <!-- 游戏模块 -->
+    <div class="module-card">
+      <div class="module-icon">🎮</div>
+      <h3 class="module-title">心理游戏</h3>
+      <p class="module-desc">通过趣味游戏放松身心、缓解焦虑、提升专注力，在娱乐中调节情绪。</p>
+      <a href="#" class="module-btn" onclick="showGames()">浏览游戏</a>
+    </div>
+
+    <!-- 问卷模块 -->
+    <div class="module-card">
+      <div class="module-icon">📝</div>
+      <h3 class="module-title">心理问卷</h3>
+      <p class="module-desc">专业量表测评，全面了解自身心理状态，获取个性化成长建议。</p>
+      <a href="心情快筛.html" class="module-btn">开始测评</a>
+    </div>
+  </div>
+
+  <!-- 游戏分类弹窗 -->
+  <div class="game-category" id="gameCategory">
+    <div class="category-content">
+      <span class="close-btn" onclick="hideGames()">×</span>
+      <h3 class="category-title">心理游戏分类</h3>
+      <div class="games-grid">
+        <div class="game-item">
+          <div class="game-name">数字解压迷宫</div>
+          <a href="迷宫.html" class="game-link">开始游戏 →</a>
+        </div>
+        <div class="game-item">
+          <div class="game-name">四关多彩捏泡泡挑战</div>
+          <a href="捏泡泡.html" class="game-link">开始游戏 →</a>
+        </div>
+        <div class="game-item">
+          <div class="game-name">数字冥想</div>
+          <a href="数字冥想.html" class="game-link">开始游戏 →</a>
+        </div>
+        <div class="game-item">
+          <div class="game-name">撕纸条</div>
+          <a href="撕纸条1.html" class="game-link">开始游戏 →</a>
+        </div>
+        <div class="game-item">
+          <div class="game-name">数字消除挑战</div>
+          <a href="消除数字.html" class="game-link">开始游戏 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 交互脚本 -->
+  <script>
+    // 显示游戏分类
+    function showGames() {
+      document.getElementById('gameCategory').style.display = 'flex';
+    }
+    // 隐藏游戏分类
+    function hideGames() {
+      document.getElementById('gameCategory').style.display = 'none';
+    }
+    // 点击空白处关闭弹窗
+    window.onclick = function (e) {
+      const category = document.getElementById('gameCategory');
+      if (e.target === category) {
+        hideGames();
+      }
+    }
+  </script>
+</body>
+
+</html>

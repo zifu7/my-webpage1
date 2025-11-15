@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字减压迷宫（HTML版）</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #141428;
+      /* BACKGROUND */
+      font-family: "Microsoft YaHei", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      color: #e0e0ff;
+      /* TEXT_COLOR */
+    }
+
+    .game-container {
+      position: relative;
+      border: 2px solid #6464b4;
+      /* WALL_COLOR */
+      background-color: #141428;
+    }
+
+    .cell {
+      position: absolute;
+      background-color: #e6e6fa;
+      /* PATH_COLOR */
+      border: 1px solid #141428;
+      /* 网格线 */
+    }
+
+    .wall {
+      background-color: #6464b4;
+      /* WALL_COLOR */
+    }
+
+    .player {
+      position: absolute;
+      border-radius: 50%;
+      background-color: #ff6464;
+      /* PLAYER_COLOR */
+      box-shadow: 0 0 10px rgba(255, 100, 100, 0.8);
+      z-index: 10;
+    }
+
+    .end {
+      position: absolute;
+      background-color: #64ff64;
+      /* 终点绿色 */
+      z-index: 5;
+    }
+
+    .ui {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #e0e0ff;
+    }
+
+    .instructions {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .score {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .success提示 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: #64ff64;
+      background-color: rgba(20, 20, 64, 0.9);
+      padding: 15px 30px;
+      border-radius: 10px;
+      display: none;
+      z-index: 20;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ui">
+    <h1 class="title">数字减压迷宫</h1>
+    <div class="instructions">
+      使用方向键移动红色圆点 | 找到绿色出口完成迷宫 | R键：重新生成迷宫 | 放松心情，享受探索过程
+    </div>
+    <div class="score">步数: 0</div>
+  </div>
+
+  <div class="game-container" id="gameContainer">
+    <div class="success提示" id="successTip">恭喜完成! 新迷宫已生成</div>
+  </div>
+
+  <script>
+    // 游戏配置（对应原Pygame参数）
+    const CELL_SIZE = 40;
+    const WIDTH = 800;
+    const HEIGHT = 600;
+    const COLS = WIDTH / CELL_SIZE;
+    const ROWS = HEIGHT / CELL_SIZE;
+
+    // DOM元素
+    const gameContainer = document.getElementById('gameContainer');
+    const scoreEl = document.querySelector('.score');
+    const successTip = document.getElementById('successTip');
+
+    // 初始化游戏容器大小
+    gameContainer.style.width = `${WIDTH}px`;
+    gameContainer.style.height = `${HEIGHT}px`;
+
+    // 游戏状态
+    let maze = [];
+    let playerX = 1; // 玩家初始X（列）
+    let playerY = 1; // 玩家初始Y（行）
+    let score = 0;
+    let successShowTimer = null;
+
+    // 生成迷宫（复刻原深度优先搜索逻辑）
+    function generateMaze() {
+      // 初始化所有单元格为墙（1=墙，0=路径）
+      maze = Array(ROWS).fill(0).map(() => Array(COLS).fill(1));
+
+      // 深度优先搜索挖路
+      function carvePath(x, y) {
+        maze[y][x] = 0; // 标记当前为路径
+
+        // 四个方向（上下左右，步长2避免相邻路径）
+        const directions = [[0, -2], [2, 0], [0, 2], [-2, 0]];
+        // 随机打乱方向
+        directions.sort(() => Math.random() - 0.5);
+
+        for (const [dx, dy] of directions) {
+          const nx = x + dx;
+          const ny = y + dy;
+          // 检查边界和是否未挖路
+          if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS && maze[ny][nx] === 1) {
+            // 打通中间的墙
+            maze[y + dy / 2][x + dx / 2] = 0;
+            carvePath(nx, ny);
+          }
+        }
+      }
+
+      // 从(1,1)开始挖路
+      carvePath(1, 1);
+      // 设置终点（右下角）
+      maze[ROWS - 2][COLS - 2] = 0;
+      maze[ROWS - 1][COLS - 2] = 0;
+
+      return maze;
+    }
+
+    // 绘制迷宫
+    function drawMaze() {
+      // 清空容器
+      gameContainer.innerHTML = '<div class="success提示" id="successTip">恭喜完成! 新迷宫已生成</div>';
+
+      // 绘制单元格
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const cell = document.createElement('div');
+          cell.className = `cell ${maze[y][x] === 1 ? 'wall' : ''}`;
+          cell.style.width = `${CELL_SIZE}px`;
+          cell.style.height = `${CELL_SIZE}px`;
+          cell.style.left = `${x * CELL_SIZE}px`;
+          cell.style.top = `${y * CELL_SIZE}px`;
+          gameContainer.appendChild(cell);
+        }
+      }
+
+      // 绘制终点
+      const end = document.createElement('div');
+      end.className = 'end';
+      end.style.width = `${CELL_SIZE}px`;
+      end.style.height = `${CELL_SIZE}px`;
+      end.style.left = `${(COLS - 2) * CELL_SIZE}px`;
+      end.style.top = `${(ROWS - 2) * CELL_SIZE}px`;
+      gameContainer.appendChild(end);
+
+      // 绘制玩家
+      const player = document.createElement('div');
+      player.className = 'player';
+      player.style.width = `${CELL_SIZE * 0.6}px`;
+      player.style.height = `${CELL_SIZE * 0.6}px`;
+      player.style.left = `${playerX * CELL_SIZE + CELL_SIZE * 0.2}px`;
+      player.style.top = `${playerY * CELL_SIZE + CELL_SIZE * 0.2}px`;
+      gameContainer.appendChild(player);
+    }
+
+    // 更新分数显示
+    function updateScore() {
+      scoreEl.textContent = `步数: ${score}`;
+    }
+
+    // 显示成功提示
+    function showSuccessTip() {
+      clearTimeout(successShowTimer);
+      successTip.style.display = 'block';
+      successShowTimer = setTimeout(() => {
+        successTip.style.display = 'none';
+      }, 2000);
+    }
+
+    // 初始化游戏
+    function initGame() {
+      maze = generateMaze();
+      playerX = 1;
+      playerY = 1;
+      score = 0;
+      updateScore();
+      drawMaze();
+    }
+
+    // 键盘控制
+    document.addEventListener('keydown', (e) => {
+      let newX = playerX;
+      let newY = playerY;
+
+      // 方向键移动
+      switch (e.key) {
+        case 'ArrowUp': newY -= 1; break;
+        case 'ArrowDown': newY += 1; break;
+        case 'ArrowLeft': newX -= 1; break;
+        case 'ArrowRight': newX += 1; break;
+        case 'r': case 'R': // 重新生成迷宫
+          initGame();
+          return;
+      }
+
+      // 检查移动是否有效（边界+非墙）
+      if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS && maze[newY][newX] === 0) {
+        playerX = newX;
+        playerY = newY;
+        score += 1;
+        updateScore();
+        drawMaze();
+
+        // 检查是否到达终点
+        if (playerX === COLS - 2 && playerY === ROWS - 2) {
+          score += 100; // 完成奖励
+          updateScore();
+          showSuccessTip();
+          // 生成新迷宫
+          setTimeout(() => {
+            maze = generateMaze();
+            playerX = 1;
+            playerY = 1;
+            drawMaze();
+          }, 1000);
+        }
+      }
+    });
+
+    // 启动游戏
+    initGame();
+  </script>
+</body>
+
+</html>

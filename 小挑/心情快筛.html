@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心晴快筛 - 完整功能版（含SCL风格结果页）</title>
+  <style>
+    body {
+      font-family: "Microsoft Yahei", sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 20px;
+      line-height: 1.8;
+    }
+
+    .step {
+      display: none;
+      padding: 25px;
+      border-radius: 10px;
+      background: #f8f9fa;
+      margin: 20px 0;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .question {
+      margin: 20px 0;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .option-group {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      background: #4285f4;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #3367d6;
+    }
+
+    /* 选中状态样式（浅色） */
+    button.selected {
+      background: #64b5f6;
+      box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.3);
+    }
+
+    .nav-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    /* 结果页样式（SCL风格） */
+    .result-container {
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .score-card {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .score-item {
+      flex: 1;
+      min-width: 120px;
+      padding: 15px;
+      background: #f5fafe;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .score-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1a73e8;
+      margin: 5px 0;
+    }
+
+    .interpretation {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-left: 4px solid #4285f4;
+      border-radius: 4px;
+    }
+
+    .grade-tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: white;
+      margin-left: 10px;
+    }
+
+    .grade-normal {
+      background: #4caf50;
+    }
+
+    .grade-mild {
+      background: #ffc107;
+    }
+
+    .grade-severe {
+      background: #f44336;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>心晴快筛 完整测评</h1>
+
+  <!-- WHO-5 完整5题 -->
+  <div class="step active" id="step1">
+    <h2>第一步：WHO-5幸福指数（共5题）</h2>
+    <div class="question">
+      <p>1. 我感觉心情愉快</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'who5')">从不（0分）</button>
+        <button onclick="selectOption(this, 1, 'who5')">很少（1分）</button>
+        <button onclick="selectOption(this, 2, 'who5')">有时（2分）</button>
+        <button onclick="selectOption(this, 3, 'who5')">经常（3分）</button>
+        <button onclick="selectOption(this, 4, 'who5')">总是（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>2. 我对未来抱有乐观态度</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'who5')">从不（0分）</button>
+        <button onclick="selectOption(this, 1, 'who5')">很少（1分）</button>
+        <button onclick="selectOption(this, 2, 'who5')">有时（2分）</button>
+        <button onclick="selectOption(this, 3, 'who5')">经常（3分）</button>
+        <button onclick="selectOption(this, 4, 'who5')">总是（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>3. 我觉得自己很有用</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'who5')">从不（0分）</button>
+        <button onclick="selectOption(this, 1, 'who5')">很少（1分）</button>
+        <button onclick="selectOption(this, 2, 'who5')">有时（2分）</button>
+        <button onclick="selectOption(this, 3, 'who5')">经常（3分）</button>
+        <button onclick="selectOption(this, 4, 'who5')">总是（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>4. 我能从日常活动中获得乐趣</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'who5')">从不（0分）</button>
+        <button onclick="selectOption(this, 1, 'who5')">很少（1分）</button>
+        <button onclick="selectOption(this, 2, 'who5')">有时（2分）</button>
+        <button onclick="selectOption(this, 3, 'who5')">经常（3分）</button>
+        <button onclick="selectOption(this, 4, 'who5')">总是（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>5. 我感觉自己和周围人相处融洽</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'who5')">从不（0分）</button>
+        <button onclick="selectOption(this, 1, 'who5')">很少（1分）</button>
+        <button onclick="selectOption(this, 2, 'who5')">有时（2分）</button>
+        <button onclick="selectOption(this, 3, 'who5')">经常（3分）</button>
+        <button onclick="selectOption(this, 4, 'who5')">总是（4分）</button>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button onclick="goToStep('step2')">完成 → 进入DASS-21</button>
+    </div>
+  </div>
+
+  <!-- DASS-21 完整21题 -->
+  <div class="step" id="step2">
+    <h2>第二步：DASS-21抑郁焦虑压力量表（共21题）</h2>
+    <p>过去一周内，这些情况对你的困扰程度：</p>
+
+    <!-- 抑郁维度7题 -->
+    <div class="question">
+      <p>（抑郁1）我感到情绪低落、沮丧</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassDepression')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassDepression')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassDepression')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassDepression')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassDepression')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（抑郁2）我对平时喜欢的活动提不起兴趣</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassDepression')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassDepression')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassDepression')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassDepression')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassDepression')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（抑郁3）我觉得自己比不上别人</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassDepression')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassDepression')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassDepression')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassDepression')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassDepression')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（抑郁4）我没办法振作起来</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassDepression')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassDepression')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassDepression')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassDepression')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassDepression')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（抑郁5）我对任何事情都抱持悲观态度</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassDepression')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassDepression')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassDepression')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassDepression')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassDepression')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（抑郁6）我觉得自己很没用</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassDepression')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassDepression')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassDepression')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassDepression')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassDepression')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（抑郁7）我觉得生命没有意义</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassDepression')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassDepression')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassDepression')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassDepression')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassDepression')">极其严重（4分）</button>
+      </div>
+    </div>
+
+    <!-- 焦虑维度7题 -->
+    <div class="question">
+      <p>（焦虑1）我感到呼吸困难（比如胸闷、喘不过气）</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassAnxiety')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassAnxiety')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassAnxiety')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassAnxiety')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassAnxiety')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（焦虑2）我感到手抖</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassAnxiety')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassAnxiety')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassAnxiety')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassAnxiety')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassAnxiety')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（焦虑3）我感到紧张不安</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassAnxiety')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassAnxiety')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassAnxiety')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassAnxiety')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassAnxiety')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（焦虑4）我感到害怕，却不知道怕什么</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassAnxiety')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassAnxiety')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassAnxiety')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassAnxiety')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassAnxiety')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（焦虑5）我心跳得很厉害</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassAnxiety')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassAnxiety')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassAnxiety')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassAnxiety')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassAnxiety')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（焦虑6）我感到晕眩</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassAnxiety')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassAnxiety')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassAnxiety')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassAnxiety')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassAnxiety')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（焦虑7）我感到坐立难安</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassAnxiety')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassAnxiety')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassAnxiety')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassAnxiety')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassAnxiety')">极其严重（4分）</button>
+      </div>
+    </div>
+
+    <!-- 压力维度7题 -->
+    <div class="question">
+      <p>（压力1）我很容易被激怒</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassStress')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassStress')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassStress')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassStress')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassStress')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（压力2）我觉得很难放松</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassStress')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassStress')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassStress')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassStress')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassStress')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（压力3）我感到很紧张</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassStress')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassStress')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassStress')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassStress')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassStress')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（压力4）我没办法容忍任何阻碍我完成事情的东西</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassStress')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassStress')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassStress')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassStress')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassStress')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（压力5）我感到很难平静下来</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassStress')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassStress')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassStress')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassStress')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassStress')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（压力6）我变得容易受惊</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassStress')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassStress')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassStress')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassStress')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassStress')">极其严重（4分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>（压力7）我因为过度担忧而无法专注</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'dassStress')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'dassStress')">有一点（1分）</button>
+        <button onclick="selectOption(this, 2, 'dassStress')">中等程度（2分）</button>
+        <button onclick="selectOption(this, 3, 'dassStress')">相当严重（3分）</button>
+        <button onclick="selectOption(this, 4, 'dassStress')">极其严重（4分）</button>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button onclick="goToStep('step1')">← 返回上一步</button>
+      <button onclick="goToStep('step3')">完成 → 进入GAD-7</button>
+    </div>
+  </div>
+
+  <!-- GAD-7 完整7题 -->
+  <div class="step" id="step3">
+    <h2>第三步：GAD-7焦虑专项评估（共7题）</h2>
+    <p>过去两周内，这些情况出现的频率：</p>
+    <div class="question">
+      <p>1. 我感到紧张、焦虑或烦躁</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'gad7')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'gad7')">几天（1分）</button>
+        <button onclick="selectOption(this, 2, 'gad7')">一半以上天数（2分）</button>
+        <button onclick="selectOption(this, 3, 'gad7')">几乎每天（3分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>2. 我无法控制自己的担忧</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'gad7')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'gad7')">几天（1分）</button>
+        <button onclick="selectOption(this, 2, 'gad7')">一半以上天数（2分）</button>
+        <button onclick="selectOption(this, 3, 'gad7')">几乎每天（3分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>3. 我对很多事情都感到担忧</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'gad7')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'gad7')">几天（1分）</button>
+        <button onclick="selectOption(this, 2, 'gad7')">一半以上天数（2分）</button>
+        <button onclick="selectOption(this, 3, 'gad7')">几乎每天（3分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>4. 我很难放松下来</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'gad7')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'gad7')">几天（1分）</button>
+        <button onclick="selectOption(this, 2, 'gad7')">一半以上天数（2分）</button>
+        <button onclick="selectOption(this, 3, 'gad7')">几乎每天（3分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>5. 我因为不安而坐立难安</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'gad7')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'gad7')">几天（1分）</button>
+        <button onclick="selectOption(this, 2, 'gad7')">一半以上天数（2分）</button>
+        <button onclick="selectOption(this, 3, 'gad7')">几乎每天（3分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>6. 我容易感到害怕</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'gad7')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'gad7')">几天（1分）</button>
+        <button onclick="selectOption(this, 2, 'gad7')">一半以上天数（2分）</button>
+        <button onclick="selectOption(this, 3, 'gad7')">几乎每天（3分）</button>
+      </div>
+    </div>
+    <div class="question">
+      <p>7. 我感到心跳得很厉害，甚至觉得心慌</p>
+      <div class="option-group">
+        <button onclick="selectOption(this, 0, 'gad7')">完全没有（0分）</button>
+        <button onclick="selectOption(this, 1, 'gad7')">几天（1分）</button>
+        <button onclick="selectOption(this, 2, 'gad7')">一半以上天数（2分）</button>
+        <button onclick="selectOption(this, 3, 'gad7')">几乎每天（3分）</button>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button onclick="goToStep('step2')">← 返回上一步</button>
+      <button onclick="generateResult()">提交测评 → 查看结果</button>
+    </div>
+  </div>
+
+  <!-- SCL风格结果页 -->
+  <div class="step" id="stepResult">
+    <h2>心晴快筛 测评结果报告</h2>
+    <div class="result-container">
+      <p>尊敬的用户，以下是您的完整测评结果，仅供参考：</p>
+
+      <!-- 分项得分卡片 -->
+      <div class="score-card">
+        <div class="score-item">
+          <p>WHO-5幸福指数</p>
+          <div class="score-value" id="who5Score">0</div>
+          <p>满分20分
+            <span class="grade-tag" id="who5Grade">正常</span>
+          </p>
+        </div>
+        <div class="score-item">
+          <p>DASS-21抑郁</p>
+          <div class="score-value" id="depressionScore">0</div>
+          <p>满分28分
+            <span class="grade-tag" id="depressionGrade">正常</span>
+          </p>
+        </div>
+        <div class="score-item">
+          <p>DASS-21焦虑</p>
+          <div class="score-value" id="anxietyScore">0</div>
+          <p>满分28分
+            <span class="grade-tag" id="anxietyGrade">正常</span>
+          </p>
+        </div>
+        <div class="score-item">
+          <p>DASS-21压力</p>
+          <div class="score-value" id="stressScore">0</div>
+          <p>满分28分
+            <span class="grade-tag" id="stressGrade">正常</span>
+          </p>
+        </div>
+        <div class="score-item">
+          <p>GAD-7焦虑</p>
+          <div class="score-value" id="gad7Score">0</div>
+          <p>满分21分
+            <span class="grade-tag" id="gad7Grade">正常</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- 结果解读 -->
+      <div class="interpretation">
+        <h3>结果解读：</h3>
+        <p id="resultDesc">请完成测评以获取个性化解读...</p>
+      </div>
+
+      <!-- 建议部分 -->
+      <div class="interpretation">
+        <h3>干预建议：</h3>
+        <ul id="suggestions">
+          <li>保持规律作息，保证充足睡眠。</li>
+          <li>适当进行体育锻炼，如跑步、瑜伽等。</li>
+          <li>多与家人朋友沟通，释放心理压力。</li>
+          <li>若症状持续超过2周，建议寻求专业心理机构帮助。</li>
+        </ul>
+      </div>
+      <!-- 新增：心理援助电话 -->
+      <div class="interpretation">
+        <h3>心理援助资源：</h3>
+        <p>若您需要专业心理支持，可联系以下官方援助热线（24小时服务）：</p>
+        <ul>
+          <li>全国心理援助热线：<strong>400-161-9995</strong></li>
+          <li>青少年心理援助热线：<strong>12355</strong></li>
+          <li>危机干预热线：<strong>010-82951332</strong></li>
+        </ul>
+        <p style="color: #f44336; font-weight: bold;">注：以上为官方公益热线，提供免费心理咨询服务。</p>
+      </div>
+
+      <div class="nav-buttons">
+        <button onclick="resetTest()">重新测评</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 存储各量表得分
+    let scores = {
+      who5: 0,
+      dassDepression: 0,
+      dassAnxiety: 0,
+      dassStress: 0,
+      gad7: 0
+    };
+
+    // 步骤切换（跳转后滚动到顶部）
+    function goToStep(targetStep) {
+      document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
+      });
+      document.getElementById(targetStep).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    // 选项选中与得分记录（修正：多题得分累加，而非覆盖）
+    function selectOption(btn, score, type) {
+      const siblings = btn.parentElement.querySelectorAll('button');
+      // 1. 先减去当前题目之前选中选项的得分（避免重复累加）
+      siblings.forEach(b => {
+        if (b.classList.contains('selected')) {
+          scores[type] -= parseInt(b.getAttribute('data-score') || 0);
+        }
+      });
+      // 2. 清除所有选项的选中状态
+      siblings.forEach(b => b.classList.remove('selected'));
+      // 3. 标记当前选项为选中，并存储得分
+      btn.classList.add('selected');
+      btn.setAttribute('data-score', score);
+      // 4. 累加当前题目的得分（核心修正点）
+      scores[type] += score;
+    }
+
+    // 生成SCL风格测评结果
+    function generateResult() {
+      // 计算总分（用于分级参考）
+      const totalScore = scores.who5 + scores.dassDepression + scores.dassAnxiety + scores.dassStress + scores.gad7;
+
+      // 1. 填充各维度得分
+      document.getElementById('who5Score').textContent = scores.who5;
+      document.getElementById('depressionScore').textContent = scores.dassDepression;
+      document.getElementById('anxietyScore').textContent = scores.dassAnxiety;
+      document.getElementById('stressScore').textContent = scores.dassStress;
+      document.getElementById('gad7Score').textContent = scores.gad7;
+
+      // 2. 评定各维度等级（模拟SCL分级逻辑）
+      // WHO-5幸福指数：≥13正常，8-12轻度偏低，≤7重度偏低
+      const who5Grade = scores.who5 >= 13 ? '正常' : scores.who5 >= 8 ? '轻度偏低' : '重度偏低';
+      const who5GradeClass = scores.who5 >= 13 ? 'grade-normal' : scores.who5 >= 8 ? 'grade-mild' : 'grade-severe';
+
+      // DASS-21抑郁/焦虑/压力：≤7正常，8-14轻度，15-21中度，≥22重度
+      const depGrade = scores.dassDepression <= 7 ? '正常' : scores.dassDepression <= 14 ? '轻度' : scores.dassDepression <= 21 ? '中度' : '重度';
+      const depGradeClass = scores.dassDepression <= 7 ? 'grade-normal' : scores.dassDepression <= 14 ? 'grade-mild' : 'grade-severe';
+
+      const anxGrade = scores.dassAnxiety <= 7 ? '正常' : scores.dassAnxiety <= 14 ? '轻度' : scores.dassAnxiety <= 21 ? '中度' : '重度';
+      const anxGradeClass = scores.dassAnxiety <= 7 ? 'grade-normal' : scores.dassAnxiety <= 14 ? 'grade-mild' : 'grade-severe';
+
+      const stressGrade = scores.dassStress <= 7 ? '正常' : scores.dassStress <= 14 ? '轻度' : scores.dassStress <= 21 ? '中度' : '重度';
+      const stressGradeClass = scores.dassStress <= 7 ? 'grade-normal' : scores.dassStress <= 14 ? 'grade-mild' : 'grade-severe';
+
+      // GAD-7焦虑：≤4正常，5-9轻度，10-14中度，≥15重度
+      const gad7Grade = scores.gad7 <= 4 ? '正常' : scores.gad7 <= 9 ? '轻度' : scores.gad7 <= 14 ? '中度' : '重度';
+      const gad7GradeClass = scores.gad7 <= 4 ? 'grade-normal' : scores.gad7 <= 9 ? 'grade-mild' : 'grade-severe';
+
+      // 3. 应用等级样式和文本
+      document.getElementById('who5Grade').textContent = who5Grade;
+      document.getElementById('who5Grade').className = `grade-tag ${who5GradeClass}`;
+
+      document.getElementById('depressionGrade').textContent = depGrade;
+      document.getElementById('depressionGrade').className = `grade-tag ${depGradeClass}`;
+
+      document.getElementById('anxietyGrade').textContent = anxGrade;
+      document.getElementById('anxietyGrade').className = `grade-tag ${anxGradeClass}`;
+
+      document.getElementById('stressGrade').textContent = stressGrade;
+      document.getElementById('stressGrade').className = `grade-tag ${stressGradeClass}`;
+
+      document.getElementById('gad7Grade').textContent = gad7Grade;
+      document.getElementById('gad7Grade').className = `grade-tag ${gad7GradeClass}`;
+
+      // 4. 生成个性化结果解读
+      let resultDesc = '';
+      if (totalScore < 30) {
+        resultDesc = '您的整体情绪状态良好，幸福指数较高，抑郁、焦虑及压力水平均在正常范围。建议继续保持当前的生活节奏和积极心态，维持良好的社交关系与作息习惯。';
+      } else if (totalScore < 60) {
+        resultDesc = '您的情绪状态基本稳定，但存在轻度焦虑或压力倾向，可能与近期生活事件、工作压力或作息不规律相关。幸福指数略低，需关注自身情绪调节，避免负面情绪积累。';
+      } else if (totalScore < 90) {
+        resultDesc = '您的幸福指数偏低，抑郁、焦虑或压力水平处于中度范围，可能已对日常生活、工作或人际关系产生一定影响。需优先调整心态，主动寻求支持，必要时进行专业干预。';
+      } else {
+        resultDesc = '您的情绪状态存在较明显问题，幸福指数严重偏低，抑郁、焦虑或压力水平处于重度范围，可能已显著影响生活质量。建议立即寻求家人朋友的情感支持，并及时联系专业心理机构进行系统评估与干预。';
+      }
+      document.getElementById('resultDesc').textContent = resultDesc;
+
+      // 5. 跳转到结果页
+      goToStep('stepResult');
+    }
+
+    // 重置测评（清空选中状态和得分）
+    function resetTest() {
+      // 重置得分对象
+      scores = {
+        who5: 0,
+        dassDepression: 0,
+        dassAnxiety: 0,
+        dassStress: 0,
+        gad7: 0
+      };
+
+      // 清除所有选项的选中状态
+      document.querySelectorAll('button.selected').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+
+      // 跳回第一步
+      goToStep('step1');
+    }
+  </script>
+</body>
+
+</html>
